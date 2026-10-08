@@ -63,36 +63,47 @@ void my_mergesort(int left, int right){
 /* this function will be called by the testing program. */
 void * parallel_mergesort(void *arg){
 	// --manage level of tree, control thread creation--
-	
-	// if arg->level != cutoff // when thread does not reach level, keep spliting
+	// seperate elememt from args
+	struct argument *args = (struct argument *)arg;
+
+    int left = args->left;
+    int right = args->right;
+    int level = args->level;
+	if (level < cutoff && left < right) // when thread does not reach level, keep spliting
+    {
 		// --manage new thread left right--
-		// midpoint = (arg->right + arg->left) / 2
-		// leftstart = arg->left 
-		// leftend = midpoint
-		// rightstart = midpoint + 1
-		// rightend = arg -> right
-		// level = arg->level + 1
+		int midpoint = left + (right - left) / 2;
 
-		//argument* leftArg = builArgs(leftstart, leftend, level)
-		//argument* rightArg = builArgs(rightstart, rightend, level)
-		
-		// pthread_create(t1, Null, parallel_mergesort, leftArg)
-		// pthread_create(t2, Null, parallel_mergesort, rightArg)
+        int leftstart = left;
+        int leftend = midpoint;
+        int rightstart = midpoint + 1;
+        int rightend = right;
 
+        int nextLevel = level + 1;
+
+		struct argument *leftArg = buildArgs(leftstart, leftend, nextLevel);
+        struct argument *rightArg = buildArgs(rightstart, rightend, nextLevel);
 		
+        pthread_t t1, t2;
+
 		// may call my_mergesort, depend on the level
 		// if reach cutoff level, will definitely call my_mergesort and sort the list
-		// pthread_join(t1, Null)
-		// pthread_join(t2, Null)
+		int result1 = pthread_create(&t1, NULL, parallel_mergesort, leftArg);
+        int result2 = pthread_create(&t2, NULL, parallel_mergesort, rightArg);
 
-		// merge(leftstart, leftend, rightstart, rightend)
+        pthread_join(t1, NULL);
+        pthread_join(t2, NULL);
+        
+		// Both halves are sorted; merge them
+        merge(leftstart, leftend, rightstart, rightend);
 
-		// free(leftArg)
-		// free(rightArg)
-
-	// else // when reach leavel, start mergesort
-		// my_mergesort(arg->left, arg->right)
-
+        // Parent owns and frees the child arguments
+        free(leftArg);
+        free(rightArg);
+	}
+	else{ // when reach leavel, start mergesort
+		my_mergesort(left, right);
+	}
 	return NULL;
 }
 
