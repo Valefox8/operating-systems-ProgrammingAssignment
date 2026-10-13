@@ -43,19 +43,20 @@ void merge(int leftstart, int leftend, int rightstart, int rightend){
 /* this function will be called by parallel_mergesort() as its base case. */
 void my_mergesort(int left, int right){
 	// exit case when position is the same
-	// if left == right
-		//return A[left]
+	if (left == right){
+		return;
+	}
 	
-	// midpoint = (right + left) / 2
-	// leftstart = left 
-	// leftend = midpoint
-	// rightstart = midpoint + 1
-	// rightend = right
+	int midpoint = (right + left) / 2;
+	int leftstart = left;
+	int leftend = midpoint;
+	int rightstart = midpoint + 1;
+	int rightend = right;
 
-	// my_mergesort(leftstart, leftend)
-	// my_mergesort(rightstart, rightend)
+	my_mergesort(leftstart, leftend);
+	my_mergesort(rightstart, rightend);
 
-	// merge(leftstart, leftend, rightstart, rightend)
+	merge(leftstart, leftend, rightstart, rightend);
 
 	return;
 }
