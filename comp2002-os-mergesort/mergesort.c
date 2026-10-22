@@ -92,9 +92,20 @@ void * parallel_mergesort(void *arg){
 		int result1 = pthread_create(&t1, NULL, parallel_mergesort, leftArg);
         int result2 = pthread_create(&t2, NULL, parallel_mergesort, rightArg);
 
-        pthread_join(t1, NULL);
-        pthread_join(t2, NULL);
-        
+		if(result1 == 0){
+			pthread_join(t1, NULL);
+		}
+		else{
+			my_mergesort(leftstart, leftend);
+		}
+
+		if(result2 == 0){
+			pthread_join(t2, NULL);
+		}
+		else{
+			my_mergesort(rightstart, rightend);
+		}
+
 		// Both halves are sorted; merge them
         merge(leftstart, leftend, rightstart, rightend);
 
