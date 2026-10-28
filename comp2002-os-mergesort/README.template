@@ -1,57 +1,127 @@
-README.template
-
 ## Project Number/Title 
-
-* Authors: Your Name, and your group members’ names
-* Group name: Your Group Name
+* Project Title: Parallel Merge Sort
+* Authors: Aden Ellery (a1970601), Dragan Draganovic (a3181710), Chenliang Sun (a1953023)
+* Group name: Group 2
 
 ## Overview
-
-Concisely explain what the program does. If this exceeds a couple of
-sentences, you're going too far. Generally, you should be pulling this
-right from the project specification. We don't want you to just cut and
-paste, but paraphrase what is stated in the project specification.
+The program creates Args for each thread in each level till it reaches the aimed level, each thread calls my_mergesort recursively and waits till the end child thread finishes merge sort, then merge two child threads till level 0 thread .
 
 ## Manifest
-
-A listing of source files and other non-generated files, and a brief
-(one-line) explanation of the purpose of each file.
+mergesort.c		-> implementation of using thread with merge sort algorithm
+mergesort.h		-> header file for mergesort.c
+test-mergesort.c 	-> main file to call mergesort and check correctness
 
 ## Building the project
+Makefile to  build executable:
+Executable: test-mergesort
+Included File: test-mergesort.o mergesort.o
+Compiler Option: -Wall -Wpointer-arith -Wstrict-prototypes -std=gnu89 -fPIC -MMD -MP -lpthread
+Compiler: gcc
 
-This section should tell the user how to build your code.  If you are
-delivering a library, where does it need to be installed, or how do you use
-it? Is this an executable, if so, how can a user get up to speed as fast as
-possible?
+Run executable:
+./test-mergesort <input size> <cutoff level> <seed>
+Example: ./test-mergesort 100000 1 1234
+
+
+Libraries:
+#Include <stdio.h>
+This library allows the program to read input from the user for the input size, cutoff level and seed. It also allows for output to the terminal to prompt for input. 
+
+#Include <string.h>
+Use memcpy from the library for memory transportation when merging
+
+#include <stdlib.h>
+Use malloc from the library for pre-create spaces for Argses
+
+No action needed to install library, it’s all included inside C Standard library
+
 
 ## Features and usage
+mergesort.c
+merge()		 	-> receive two arrays range, combine them with sorting order
+my_mergesort() 	-> receive the range of array, recursively divide array into two till only one element left
+parallel_mergesort()	-> keep recursively create thread till reach level or hit thread create fail, and call mergesort
+buildArgs()		-> make address location for Args and create an arg
 
-Summarise the main features of your program. It is also appropriate to
-instruct the user how to use your program.
+To use the program, first build with 
+sudo apt update && sudo apt install -y build-essential
+make 
+Then run
+./test-mergesort <input size><cutoff level><seed>, for example ./test-mergesort 10000000 0 1234
 
 ## Testing
+Test Cases:                                Outputs:
+./test-mergesort 1000 2 1234            -> Sorting 100 elements took 0.00 seconds
+./test-mergesort 100000000 3 1234       -> Sorting 100000000 elements took 2.21 seconds.
+./test-mergesort 9999 3 1234            -> Sorting 9999 elements took 0.00 seconds.
+./test-mergesort 100000000 20 1234      -> Sorting 100000000 elements took 3.81 seconds.
+./test-mergesort 100000000 1 1234       -> Sorting 100000000 elements took 5.47 seconds.
+./test-mergesort 100000000 0 1234       -> Sorting 100000000 elements took 11.11 seconds.
 
-This section should detail how you tested your code. Simply stating "I ran
-it a few times and it seems to work" is not sufficient. Your testing needs
-to be detailed here.
 
 ## Known Bugs
+From our testing, we do not believe there are any major bugs still present, there may be a few small bugs we are unaware of but nothing we have found to be present within anything more than potential edge cases. 
 
-List known bugs that you weren't able to fix (or ran out of time to fix).
+Two bugs that we fixed:
+In merge() while loop that go through specific range of array, it does not go through each element of the element in the range
+When cutoff gets bigger, pthread_create might failed
+
+Unpresent bugs:
+When there are too many function calls for parallel_mergesort(), the number of args may increase which causes memory shortage, further causing error. During testing, we never reached that issue.  
 
 ## Reflection and Self Assessment
 
-Discuss the issues you encountered during development and testing. What
-problems did you have? What did you have to research and learn on your own?
-What kinds of errors did you get? How did you fix them?
+Aden:
+Throughout our development, we didn't run into a major amount of bugs. Different group members had different 
+understandings of Data Structures and Algorithms and Operating systems and we used these understandings to our 
+advantage in the development of this project.  For me, my biggest lapse in understanding was the merge sort and 
+how it works, since i havent done DSA as a subject yet, therefore, in my research, i used sources from 
+GeeksforGeeks about merge sorts and merge sorts using multithreading. These sources helped my understanding of 
+the sort and why we would use threads in the places we did. The biggest bug we had was a segmentation fault 
+within the merge function where the implemented while loop would eventually iterate out the scope of the input
+and therefore crash. This was fixed via code review and communicating between myself and another group member. 
 
-What parts of the project did you find challenging? Is there anything that
-finally "clicked" for you in the process of working on this project? How well
-did the development and testing process go for you?
+As stated previously, the most challenging part of this project for me was understanding the merge sort, 
+not only the way the sort itself worked, but the way we could then implement concurrency. It clicked for me how
+concurrency can be used in a system to improve performance. By allocating threads to each merge split, it 
+increases the speed and the efficiency of the system. If we ensure these threads are implemented correctly and 
+never come into a position of deadlock. The testing and development was quite seamless for me, especially when
+working with peers that had a greater understanding of the sorting algorithm. 
+
+Dragan: 
+While working on our solution, no major bugs were detected. Before starting the assignment in earnest I had 
+anticipated we may have needed to implement locks or other concurrency solutions to prevent things like 
+deadlocks, however we ultimately found out that the setup of the mergesort itself excluded the possibility of 
+these issues. 
+
+Overall, the project was not particularly challenging to me as I had some familiarity with the concepts of a 
+mergesort, having taken data structures and algorithms courses in the past. I did initially need to wrap my head 
+around the idea of concurrency and how it was integrated into the mergesort solution, and how each split of the 
+array was essentially its own thread (parent) with child threads and so on. But once I grasped this initial 
+relationship the setup was fairly straightforward and intuitive, especially when we realised that deadlocks were 
+essentially impossible and not something we’d have to account for. During development we did encounter a 
+segmentation fault where a while loop could go beyond the bounds of the array. By working with my team members 
+we were able to solve this issue. The rest of the development and testing process went smoothly, with each member
+contributing their diverse understandings of algorithms, operating systems and concurrency to create a solution
+together.
+
+Chenliang Sun:
+During the assignment, we did not face any essential issues. I was expecting to encounter race conditions during
+the project, but once I started doing normal mergesort, we found out that the mergesort itself already prevented
+the race condition from happening. The only thing we should be aware of is where to split two arrays to prevent
+collision. The one error I found is when the cutoff cutoff gets bigger, for example 20, pthread_create() may 
+fail, which causes pthread_join to keep waiting for two ghost threads, causing silent failure. I then added 
+two conditions for both t1 and t2 threads to check whether they create a thread or not, and if they fail, they
+will enter mergesort directly, without creating any further args or thread that will also fail.
+
+I do not find anything challenging, since I’m taking parallel distributed computing (PDC) simultaneously, I have 
+a more clear understanding of what concurrency is and what is happening with the program. The development and 
+testing is fun, since in the early data & algorithm course I only program it without thread involvement, which is
+boring. Adding threads gave me more imagination about how performance improvement works, or how computers 
+process multiple	 units within a game. The overall assignment is simple for me.
 
 ## Sources Used
 
-If you used any sources outside of the textbook, you should list them here. 
-If you looked something up on stackoverflow.com or you use help from AI, and 
-fail to cite it in this section, it will be considered plagiarism and dealt 
-with accordingly. So be safe CITE!
+Operating Systems: Three Easy Pieces by Remzi H. Arpaci-Dusseau and Andrea C. Arpaci-Dusseau
+https://www.geeksforgeeks.org/dsa/merge-sort-using-multi-threading/
+https://www.geeksforgeeks.org/c/thread-functions-in-c-c/
