@@ -4,7 +4,9 @@
 * Group name: Group 2
 
 ## Overview
-The program creates Args for each thread in each level till it reaches the aimed level, each thread calls my_mergesort recursively and waits till the end child thread finishes merge sort, then merge two child threads till level 0 thread .
+The program creates Args for each thread in each level till it reaches the aimed level, 
+each thread calls my_mergesort recursively and waits till the end child thread finishes merge sort, 
+then merge two child threads till level 0 thread.
 
 ## Manifest
 mergesort.c		-> implementation of using thread with merge sort algorithm
@@ -25,7 +27,8 @@ Example: ./test-mergesort 100000 1 1234
 
 Libraries:
 #Include <stdio.h>
-This library allows the program to read input from the user for the input size, cutoff level and seed. It also allows for output to the terminal to prompt for input. 
+This library allows the program to read input from the user for the input size, 
+cutoff level and seed. It also allows for output to the terminal to prompt for input. 
 
 #Include <string.h>
 Use memcpy from the library for memory transportation when merging
